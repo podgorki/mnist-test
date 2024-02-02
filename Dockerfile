@@ -8,5 +8,6 @@ RUN pip install -r requirements.txt
 
 ENV DATASETPATH=""
 ENV CHECKPOINTPATH=""
+ENV LOGPATH=""
 
 ENTRYPOINT ["/bin/bash", "-c", "echo", "hello mnist!"]
