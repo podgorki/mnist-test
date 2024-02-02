@@ -37,6 +37,7 @@ class MNISTModel(L.LightningModule):
         self.net = Net()
 
     def configure_optimisers(self):
+        optimizer = optim.Adam(self.parameters(), lr=1e-3)
         return
 
     def training_step(self):
