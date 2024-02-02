@@ -22,9 +22,9 @@ def parse_args():
                         help='learning rate (default: 1.0)')
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')
-    parser.add_argument('--save-model', action='store_true', default=False,
-                        help='For Saving the current Model')
-    parser.add_argument('--dataset_path', type=str, default="DATASET",
+    parser.add_argument('--checkpoints_path', type=str, default="CHECKPOINTPATH",
+                        help='For Saving the models checkpoints')
+    parser.add_argument('--dataset_path', type=str, default="DATASETPATH",
                         help='Point to where the dataset is')
     args = parser.parse_args()
     return args
@@ -57,11 +57,12 @@ def main(args):
     loader_test = data.DataLoader(dataset_test)
 
     # train the model (hint: here are some helpful Trainer arguments for rapid idea iteration)
-    trainer = L.Trainer(devices=args.gpus,
-                        accelerator="gpu",
+    trainer = L.Trainer(accelerator="gpu",
                         strategy="deepspeed_stage_2",
                         precision=16,
-                        max_epochs=args.epochs)
+                        devices=args.gpus,
+                        max_epochs=args.epochs,
+                        default_root_dir=args.checkpoint_path)
 
     trainer.fit(model=model,
                 train_dataloaders=loader_train, valid_loader=loader_val)
