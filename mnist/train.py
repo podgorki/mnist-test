@@ -65,7 +65,7 @@ def main(args):
         precision=16,
         devices=args.gpus,
         max_epochs=args.epochs,
-        default_root_dir=args.checkpoint_path)
+        default_root_dir=os.getenv(args.checkpoint_path))
 
     trainer.fit(model=model,
                 train_dataloaders=loader_train, valid_loader=loader_val)
