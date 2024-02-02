@@ -1,6 +1,5 @@
 import os
 import argparse
-from pathlib import Path
 from torchvision.datasets import MNIST
 import torchvision.transforms as transforms
 import torch.utils.data as data
@@ -58,7 +57,8 @@ def main(args):
 
     # train the model (hint: here are some helpful Trainer arguments for rapid idea iteration)
     trainer = L.Trainer(accelerator="gpu",
-                        strategy="deepspeed_stage_2",
+                        strategy="ddp",
+                        sync_batchnorm=True,
                         precision=16,
                         devices=args.gpus,
                         max_epochs=args.epochs,
