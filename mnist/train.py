@@ -56,13 +56,16 @@ def main(args):
     loader_test = data.DataLoader(dataset_test)
 
     # train the model (hint: here are some helpful Trainer arguments for rapid idea iteration)
-    trainer = L.Trainer(accelerator="gpu",
-                        strategy="ddp",
-                        sync_batchnorm=True,
-                        precision=16,
-                        devices=args.gpus,
-                        max_epochs=args.epochs,
-                        default_root_dir=args.checkpoint_path)
+    trainer = L.Trainer(
+        enable_model_summary=True,
+        inference_mode=True,
+        accelerator="gpu",
+        strategy="ddp",
+        sync_batchnorm=True,
+        precision=16,
+        devices=args.gpus,
+        max_epochs=args.epochs,
+        default_root_dir=args.checkpoint_path)
 
     trainer.fit(model=model,
                 train_dataloaders=loader_train, valid_loader=loader_val)
