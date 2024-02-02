@@ -36,12 +36,13 @@ class Net(nn.Module):
 
 class MNISTModel(L.LightningModule):
 
-    def __init__(self):
+    def __init__(self, lr, seed, *args, **kwargs):
         super().__init__()
+        self.save_hyperparameters()
         self.net = Net()
 
     def configure_optimisers(self):
-        return optim.Adam(self.parameters(), lr=1e-3)
+        return optim.Adam(self.parameters(), lr=self.hparams.lr)
 
     def compute_loss(self, batch):
         input, target = batch

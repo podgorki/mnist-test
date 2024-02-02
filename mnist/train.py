@@ -18,8 +18,8 @@ def parse_args():
                         help='Number of GPUs to train with')
     parser.add_argument('--epochs', type=int, default=31, metavar='N',
                         help='number of epochs to train (default: 14)')
-    parser.add_argument('--lr', type=float, default=1.0, metavar='LR',
-                        help='learning rate (default: 1.0)')
+    parser.add_argument('--lr', type=float, default=1e-3,
+                        help='learning rate (default: 1e-3)')
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')
     parser.add_argument('--checkpoints_path', type=str, default="CHECKPOINTPATH",
@@ -30,25 +30,25 @@ def parse_args():
     return args
 
 
-def split_train(dataset_full):
+def split_train(dataset_full, seed):
     # use 20% of training data for validation
     train_set_size = int(len(dataset_full) * 0.8)
     valid_set_size = len(dataset_full) - train_set_size
 
     # split the train set into two
-    seed = torch.Generator().manual_seed(42)
+    seed = torch.Generator().manual_seed(seed)
     train_set, valid_set = data.random_split(dataset_full, [train_set_size, valid_set_size], generator=seed)
     return train_set, valid_set
 
 
 def main(args):
-    model = MNISTModel()
+    model = MNISTModel(lr=args.lr, seed=args.seed)
     # setup data
     transform = transforms.ToTensor()
     dataset_path = os.getenv(args.dataset_path)
     dataset_full = MNIST(root=dataset_path,
                          train=True, download=True, transform=transform)
-    dataset_train, dataset_val = split_train(dataset_full)
+    dataset_train, dataset_val = split_train(dataset_full, args.seed)
     loader_train = data.DataLoader(dataset_train)
     loader_val = data.DataLoader(dataset_val)
 
