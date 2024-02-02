@@ -1,13 +1,12 @@
 from __future__ import print_function
 import torch
 from torch import optim, nn, utils, Tensor
-from torchvision.datasets import MNIST
-from torchvision.transforms import ToTensor
 
 import torch.nn as nn
 import torch.nn.functional as F
 
 import lightning as L  # Note it is no longer pytorch_lightning!
+
 
 class Net(nn.Module):
     def __init__(self):
@@ -34,6 +33,7 @@ class Net(nn.Module):
         output = F.log_softmax(x, dim=1)
         return output
 
+
 class MNISTModel(L.LightningModule):
 
     def __init__(self):
@@ -43,19 +43,22 @@ class MNISTModel(L.LightningModule):
     def configure_optimisers(self):
         return optim.Adam(self.parameters(), lr=1e-3)
 
-    def training_step(self, batch, batch_idx):
-        x, target = batch
-        output = self.net(x)
+    def compute_loss(self, batch):
+        input, target = batch
+        output = self.net(input)
         loss = F.mse_loss(output, target)
+        return loss
+
+    def training_step(self, batch, batch_idx):
+        loss = self.compute_loss(batch)
         self.log("train/loss", loss)
         return loss
 
     def validation_step(self, batch, batch_idx):
-        x, target = batch
-        output = self.net(x)
-        loss = F.mse_loss(output, target)
+        loss = self.compute_loss(batch)
         self.log("val/loss", loss)
         return
 
-    def test_step(self):
-        return
+    def test_step(self, batch, batch_idx):
+        loss = self.compute_loss(batch)
+        self.log("test/loss", loss)
