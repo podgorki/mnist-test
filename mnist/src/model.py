@@ -1,13 +1,17 @@
 from __future__ import print_function
 import torch
+from torch import optim, nn, utils, Tensor
+from torchvision.datasets import MNIST
+from torchvision.transforms import ToTensor
+
 import torch.nn as nn
 import torch.nn.functional as F
 
 import lightning as L  # Note it is no longer pytorch_lightning!
 
-class Net(L.LightningModule):
+class Net(nn.Module):
     def __init__(self):
-        super(Net, self).__init__()
+        super().__init__()
         self.conv1 = nn.Conv2d(1, 32, 3, 1)
         self.conv2 = nn.Conv2d(32, 64, 3, 1)
         self.dropout1 = nn.Dropout(0.25)
@@ -37,13 +41,20 @@ class MNISTModel(L.LightningModule):
         self.net = Net()
 
     def configure_optimisers(self):
-        optimizer = optim.Adam(self.parameters(), lr=1e-3)
-        return
+        return optim.Adam(self.parameters(), lr=1e-3)
 
-    def training_step(self):
-        return
+    def training_step(self, batch, batch_idx):
+        x, target = batch
+        output = self.net(x)
+        loss = F.mse_loss(output, target)
+        self.log("train/loss", loss)
+        return loss
 
-    def validation_step(self):
+    def validation_step(self, batch, batch_idx):
+        x, target = batch
+        output = self.net(x)
+        loss = F.mse_loss(output, target)
+        self.log("val/loss", loss)
         return
 
     def test_step(self):
