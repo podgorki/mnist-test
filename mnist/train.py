@@ -44,17 +44,21 @@ def split_train(dataset_full, seed):
     return train_set, valid_set
 
 
+def get_env(argument: str, to_lower: bool = False):
+    argument = os.getenv(args.argument)
+    if argument is None:
+        argument = args.argument
+    return argument.lower if to_lower else argument
+
+
 def main(args):
     # create model
     model = MNISTModel(lr=args.lr, seed=args.seed)
 
     # set paths
-    dataset_path = os.getenv(args.dataset_path)
-    if dataset_path is None:
-        dataset_path = args.dataset_path
-    log_path = os.getenv(args.log_path)
-    if log_path is None:
-        log_path = args.log_path
+    dataset_path = get_env(args.dataset_path)
+    log_path = get_env(args.log_path)
+    logger_type = get_env(args.logger, to_lower=True)
 
     transform = transforms.ToTensor()
 
@@ -70,9 +74,10 @@ def main(args):
     loader_test = data.DataLoader(dataset_test, batch_size=args.batch_size, pin_memory=True, num_workers=7)
 
     # logger
-    if args.logger.lower() == 'tensorboard':
+
+    if logger_type == 'tensorboard':
         logger = pl_loggers.TensorBoardLogger(save_dir=log_path)
-    elif args.logger.lower() == 'wandb':
+    elif logger_type == 'wandb':
         project = os.getenv('PROJECT')
         import wandb
         wandb.login(key=os.getenv('WANDBKEY'))
