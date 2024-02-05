@@ -13,7 +13,7 @@ from src.model import MNISTModel
 def parse_args():
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch Lightning MNIST Example')
-    parser.add_argument('--batch-size', type=int, default=64, metavar='N',
+    parser.add_argument('--batch-size', type=int, default=1024, metavar='N',
                         help='input batch size for training (default: 64)')
     parser.add_argument('--gpus', type=int, default=1,
                         help='Number of GPUs to train with')
@@ -69,6 +69,7 @@ def main(args):
     except Exception as e:
         print(e)
         log_path = args.log_path
+    print(log_path)
     logger = pl_loggers.TensorBoardLogger(save_dir=log_path)
 
     # train the model
@@ -81,7 +82,7 @@ def main(args):
         precision="16-mixed",
         devices=args.gpus,
         max_epochs=args.epochs,
-        default_root_dir=os.getenv(args.checkpoint_path),
+        ckpt_path=os.getenv(args.checkpoint_path),
         logger=logger)
 
     trainer.fit(model=model,

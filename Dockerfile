@@ -13,9 +13,11 @@ RUN python3 -m pip install --upgrade pip
 
 WORKDIR /root
 
-RUN git clone https://github.com/podgorki/mnist-test.git
+ADD "https://api.github.com/repos/podgorki/mnist-test/commits?per_page=1" latest_commit
+RUN curl -sLO "https://github.com/podgorki/mnist-test/archive/main.zip" && unzip main.zip
+RUN rm main.zip
 
-RUN cd mnist-test && pip install -r requirements.txt
+RUN cd mnist-test-main && pip install -r requirements.txt
 
 ENV DATASETPATH=""
 ENV CHECKPOINTPATH=""

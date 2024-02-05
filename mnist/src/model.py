@@ -1,7 +1,5 @@
-from __future__ import print_function
 import torch
-from torch import optim, nn, utils, Tensor
-
+from torch import optim
 import torch.nn as nn
 import torch.nn.functional as F
 
