@@ -23,8 +23,6 @@ def parse_args():
                         help='learning rate (default: 1e-3)')
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')
-    parser.add_argument('--checkpoint_path', default="CHECKPOINTPATH", type=str,
-                        help='For Saving the models checkpoints')
     parser.add_argument('--dataset_path', default="DATASETPATH", type=str,
                         help='Point to where the dataset is')
     parser.add_argument('--log_path', default="LOGPATH", type=str,
@@ -56,7 +54,7 @@ def main(args):
     dataset_full = MNIST(root=dataset_path,
                          train=True, download=True, transform=transform)
     dataset_train, dataset_val = split_train(dataset_full, args.seed)
-    loader_train = data.DataLoader(dataset_train)
+    loader_train = data.DataLoader(dataset_train, batch_size=args.batch_size, pin_memory=True, num_workers=7)
     loader_val = data.DataLoader(dataset_val, batch_size=args.batch_size, pin_memory=True, num_workers=7)
 
     dataset_test = MNIST(root=dataset_path,
@@ -72,13 +70,6 @@ def main(args):
 
     logger = pl_loggers.TensorBoardLogger(save_dir=log_path)
 
-    try:
-        checkpoint_path = os.getenv(args.checkpoint_path)
-    except Exception as e:
-        print(e)
-        checkpoint_path = args.checkpoint_path
-
-
     # train the model
     trainer = L.Trainer(
         enable_model_summary=True,
@@ -93,8 +84,7 @@ def main(args):
 
     trainer.fit(model=model,
                 train_dataloaders=loader_train,
-                val_dataloaders=loader_val,
-                ckpt_path=checkpoint_path)
+                val_dataloaders=loader_val)
 
     trainer.test(model, dataloaders=loader_test)
 
