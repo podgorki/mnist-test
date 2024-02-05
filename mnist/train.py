@@ -60,6 +60,7 @@ def main(args):
     loader_test = data.DataLoader(dataset_test)
 
     # train the model (hint: here are some helpful Trainer arguments for rapid idea iteration)
+    print(MNISTModel)
     trainer = L.Trainer(
         enable_model_summary=True,
         inference_mode=True,
@@ -72,7 +73,9 @@ def main(args):
         default_root_dir=os.getenv(args.checkpoint_path))
 
     trainer.fit(model=model,
-                train_dataloaders=loader_train, val_dataloaders=loader_val)
+                train_dataloaders=loader_train,
+                val_dataloaders=loader_val)
+
     trainer.test(model, dataloaders=loader_test)
 
     return

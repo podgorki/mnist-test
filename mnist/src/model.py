@@ -41,25 +41,25 @@ class MNISTModel(L.LightningModule):
         self.save_hyperparameters()
         self.net = Net()
 
-    def configure_optimisers(self):
+    def configure_optimizers(self):
         return optim.Adam(self.parameters(), lr=self.hparams.lr)
 
     def compute_loss(self, batch):
-        input, target = batch
-        output = self.net(input)
-        loss = F.mse_loss(output, target)
+        x, y = batch
+        y_hat = self.net(x)
+        loss = F.nll_loss(y_hat, y)
         return loss
 
     def training_step(self, batch, batch_idx):
         loss = self.compute_loss(batch)
-        self.log("train/loss", loss)
+        self.log("train/loss", loss, sync_dist=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
         loss = self.compute_loss(batch)
-        self.log("val/loss", loss)
+        self.log("val/loss", loss, sync_dist=True)
         return
 
     def test_step(self, batch, batch_idx):
         loss = self.compute_loss(batch)
-        self.log("test/loss", loss)
+        self.log("test/loss", loss, sync_dist=True)
