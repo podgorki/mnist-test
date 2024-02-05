@@ -1,2 +1,1 @@
-smbprotocol  # if using a smb network drive
 lightning
