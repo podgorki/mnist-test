@@ -27,5 +27,5 @@ RUN rm main.zip
 
 RUN cd mnist-test-main && pip install -r requirements.txt
 
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["/bin/bash" , "-c" ,"python3 mnist-test-main/mnist/train.py"]
 
