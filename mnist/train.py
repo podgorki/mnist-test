@@ -57,11 +57,11 @@ def main(args):
                          train=True, download=True, transform=transform)
     dataset_train, dataset_val = split_train(dataset_full, args.seed)
     loader_train = data.DataLoader(dataset_train)
-    loader_val = data.DataLoader(dataset_val)
+    loader_val = data.DataLoader(dataset_val, batch_size=args.batch_size, pin_memory=True, num_workers=7)
 
     dataset_test = MNIST(root=dataset_path,
                          train=False, download=True, transform=transform)
-    loader_test = data.DataLoader(dataset_test)
+    loader_test = data.DataLoader(dataset_test, batch_size=args.batch_size, pin_memory=True, num_workers=7)
 
     # logger
     try:
@@ -82,12 +82,12 @@ def main(args):
         precision="16-mixed",
         devices=args.gpus,
         max_epochs=args.epochs,
-        ckpt_path=os.getenv(args.checkpoint_path),
         logger=logger)
 
     trainer.fit(model=model,
                 train_dataloaders=loader_train,
-                val_dataloaders=loader_val)
+                val_dataloaders=loader_val,
+                ckpt_path=os.getenv(args.checkpoint_path),)
 
     trainer.test(model, dataloaders=loader_test)
 
