@@ -5,6 +5,8 @@ import torchvision.transforms as transforms
 import torch.utils.data as data
 import torch
 import lightning as L  # Note it is no longer pytorch_lightning!
+from lightning.pytorch import loggers as pl_loggers
+
 from src.model import MNISTModel
 
 
@@ -25,6 +27,8 @@ def parse_args():
                         help='For Saving the models checkpoints')
     parser.add_argument('--dataset_path', default="DATASETPATH", type=str,
                         help='Point to where the dataset is')
+    parser.add_argument('--log_path', default="LOGPATH", type=str,
+                        help='Point to where the logs will go')
     args = parser.parse_args()
     return args
 
@@ -59,8 +63,15 @@ def main(args):
                          train=False, download=True, transform=transform)
     loader_test = data.DataLoader(dataset_test)
 
-    # train the model (hint: here are some helpful Trainer arguments for rapid idea iteration)
-    print(MNISTModel)
+    # logger
+    try:
+        log_path = os.getenv(args.log_path)
+    except Exception as e:
+        print(e)
+        log_path = args.log_path
+    logger = pl_loggers.TensorBoardLogger(save_dir=log_path)
+
+    # train the model
     trainer = L.Trainer(
         enable_model_summary=True,
         inference_mode=True,
@@ -70,7 +81,8 @@ def main(args):
         precision="16-mixed",
         devices=args.gpus,
         max_epochs=args.epochs,
-        default_root_dir=os.getenv(args.checkpoint_path))
+        default_root_dir=os.getenv(args.checkpoint_path),
+        logger=logger)
 
     trainer.fit(model=model,
                 train_dataloaders=loader_train,
