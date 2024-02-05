@@ -72,8 +72,7 @@ def main(args):
         default_root_dir=os.getenv(args.checkpoint_path))
 
     trainer.fit(model=model,
-                train_dataloaders=loader_train, valid_loader=loader_val)
-
+                train_dataloaders=loader_train, val_dataloaders=loader_val)
     trainer.test(model, dataloaders=loader_test)
 
     return

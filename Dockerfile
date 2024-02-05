@@ -2,6 +2,7 @@ FROM nvcr.io/nvidia/pytorch:24.01-py3
 
 RUN apt-get update
 
+RUN apt-get install gcc
 RUN apt-get install git
 
 # remove tiny vim and reinstall full vim
@@ -21,4 +22,4 @@ ENV CHECKPOINTPATH=""
 ENV LOGPATH=""
 
 ENTRYPOINT ["/bin/bash"]
-RUN ["echo", "hello mnist!"]
+
