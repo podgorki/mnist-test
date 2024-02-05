@@ -27,7 +27,7 @@ def parse_args():
                         help='Point to where the dataset is')
     parser.add_argument('--log_path', default="LOGPATH", type=str,
                         help='Point to where the logs will go')
-    parser.add_argument('--logger', default="LOGGER", type=str,
+    parser.add_argument('--logger_type', default="LOGGERTYPE", type=str,
                         help='The logger to use, supported: [tensorboard, wandb]')
     args = parser.parse_args()
     return args
@@ -45,9 +45,9 @@ def split_train(dataset_full, seed):
 
 
 def get_env(argument: str, to_lower: bool = False):
-    argument = os.getenv(args.argument)
+    argument = os.getenv(argument)
     if argument is None:
-        argument = args.argument
+        argument = argument
     return argument.lower if to_lower else argument
 
 
@@ -74,7 +74,6 @@ def main(args):
     loader_test = data.DataLoader(dataset_test, batch_size=args.batch_size, pin_memory=True, num_workers=7)
 
     # logger
-
     if logger_type == 'tensorboard':
         logger = pl_loggers.TensorBoardLogger(save_dir=log_path)
     elif logger_type == 'wandb':
@@ -83,6 +82,8 @@ def main(args):
         wandb.login(key=os.getenv('WANDBKEY'))
         logger = pl_loggers.WandbLogger(save_dir=log_path, project=project)
         logger.watch(model, log='all')
+    else:
+        raise Exception('No valid logger selected!')
 
     # train the model
     trainer = L.Trainer(
