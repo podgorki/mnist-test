@@ -48,7 +48,7 @@ def get_env(argument: str, to_lower: bool = False):
     argument = os.getenv(argument)
     if argument is None:
         argument = argument
-    return argument.lower if to_lower else argument
+    return argument.lower() if to_lower else argument
 
 
 def main(args):
@@ -58,7 +58,7 @@ def main(args):
     # set paths
     dataset_path = get_env(args.dataset_path)
     log_path = get_env(args.log_path)
-    logger_type = get_env(args.logger, to_lower=True)
+    logger_type = get_env(args.logger_type, to_lower=True)
 
     transform = transforms.ToTensor()
 
@@ -83,7 +83,7 @@ def main(args):
         logger = pl_loggers.WandbLogger(save_dir=log_path, project=project)
         logger.watch(model, log='all')
     else:
-        raise Exception('No valid logger selected!')
+        raise Exception(f'Logger type: {logger_type} not valid. No valid logger selected!')
 
     # train the model
     trainer = L.Trainer(
