@@ -15,15 +15,15 @@ def parse_args():
                         help='input batch size for training (default: 64)')
     parser.add_argument('--gpus', type=int, default=1,
                         help='Number of GPUs to train with')
-    parser.add_argument('--epochs', type=int, default=31, metavar='N',
+    parser.add_argument('--epochs', type=int, default=1, metavar='N',
                         help='number of epochs to train (default: 14)')
     parser.add_argument('--lr', type=float, default=1e-3,
                         help='learning rate (default: 1e-3)')
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')
-    parser.add_argument('--checkpoints_path', type=str, default="CHECKPOINTPATH",
+    parser.add_argument('--checkpoint_path', default="CHECKPOINTPATH", type=str,
                         help='For Saving the models checkpoints')
-    parser.add_argument('--dataset_path', type=str, default="DATASETPATH",
+    parser.add_argument('--dataset_path', default="DATASETPATH", type=str,
                         help='Point to where the dataset is')
     args = parser.parse_args()
     return args
@@ -44,7 +44,11 @@ def main(args):
     model = MNISTModel(lr=args.lr, seed=args.seed)
     # setup data
     transform = transforms.ToTensor()
-    dataset_path = os.getenv(args.dataset_path)
+    try:
+        dataset_path = os.getenv(args.dataset_path)
+    except Exception as e:
+        print(e)
+        dataset_path = args.dataset_path
     dataset_full = MNIST(root=dataset_path,
                          train=True, download=True, transform=transform)
     dataset_train, dataset_val = split_train(dataset_full, args.seed)
@@ -62,7 +66,7 @@ def main(args):
         accelerator="gpu",
         strategy="ddp",
         sync_batchnorm=True,
-        precision=16,
+        precision="16-mixed",
         devices=args.gpus,
         max_epochs=args.epochs,
         default_root_dir=os.getenv(args.checkpoint_path))

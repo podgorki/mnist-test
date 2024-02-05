@@ -4,6 +4,9 @@ RUN apt-get update
 
 RUN apt-get install git
 
+# remove tiny vim and reinstall full vim
+RUN apt-get remove vim -y && apt-get install vim
+
 # Upgrade pip
 RUN python3 -m pip install --upgrade pip
 
@@ -17,4 +20,5 @@ ENV DATASETPATH=""
 ENV CHECKPOINTPATH=""
 ENV LOGPATH=""
 
-ENTRYPOINT ["/bin/bash", "-c", "echo", "hello mnist!"]
+ENTRYPOINT ["/bin/bash"]
+RUN ["echo", "hello mnist!"]
