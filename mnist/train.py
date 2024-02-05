@@ -69,8 +69,15 @@ def main(args):
     except Exception as e:
         print(e)
         log_path = args.log_path
-    print(log_path)
+
     logger = pl_loggers.TensorBoardLogger(save_dir=log_path)
+
+    try:
+        checkpoint_path = os.getenv(args.checkpoint_path)
+    except Exception as e:
+        print(e)
+        checkpoint_path = args.checkpoint_path
+
 
     # train the model
     trainer = L.Trainer(
@@ -87,7 +94,7 @@ def main(args):
     trainer.fit(model=model,
                 train_dataloaders=loader_train,
                 val_dataloaders=loader_val,
-                ckpt_path=os.getenv(args.checkpoint_path),)
+                ckpt_path=checkpoint_path)
 
     trainer.test(model, dataloaders=loader_test)
 
