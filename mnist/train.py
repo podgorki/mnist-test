@@ -43,14 +43,20 @@ def split_train(dataset_full, seed):
 
 
 def main(args):
+    # create model
     model = MNISTModel(lr=args.lr, seed=args.seed)
-    # setup data
-    transform = transforms.ToTensor()
-    try:
-        dataset_path = os.getenv(args.dataset_path)
-    except Exception as e:
-        print(e)
+
+    # set paths
+    dataset_path = os.getenv(args.dataset_path)
+    if dataset_path is None:
         dataset_path = args.dataset_path
+    log_path = os.getenv(args.log_path)
+    if log_path is None:
+        log_path = args.log_path
+
+    transform = transforms.ToTensor()
+
+    # setup data
     dataset_full = MNIST(root=dataset_path,
                          train=True, download=True, transform=transform)
     dataset_train, dataset_val = split_train(dataset_full, args.seed)
@@ -62,12 +68,6 @@ def main(args):
     loader_test = data.DataLoader(dataset_test, batch_size=args.batch_size, pin_memory=True, num_workers=7)
 
     # logger
-    try:
-        log_path = os.getenv(args.log_path)
-    except Exception as e:
-        print(e)
-        log_path = args.log_path
-
     logger = pl_loggers.TensorBoardLogger(save_dir=log_path)
 
     # train the model
