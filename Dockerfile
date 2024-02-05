@@ -17,6 +17,9 @@ WORKDIR /root
 
 ENV DATASETPATH=""
 ENV LOGPATH=""
+ENV LOGGER="wandb"
+ENV PROJECT="mnist-test"
+ENV WANDBKEY=""
 
 ADD "https://api.github.com/repos/podgorki/mnist-test/commits?per_page=1" latest_commit
 RUN curl -sLO "https://github.com/podgorki/mnist-test/archive/main.zip" && unzip main.zip

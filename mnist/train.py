@@ -27,6 +27,8 @@ def parse_args():
                         help='Point to where the dataset is')
     parser.add_argument('--log_path', default="LOGPATH", type=str,
                         help='Point to where the logs will go')
+    parser.add_argument('--logger', default="LOGGER", type=str,
+                        help='The logger to use, supported: [tensorboard, wandb]')
     args = parser.parse_args()
     return args
 
@@ -68,7 +70,14 @@ def main(args):
     loader_test = data.DataLoader(dataset_test, batch_size=args.batch_size, pin_memory=True, num_workers=7)
 
     # logger
-    logger = pl_loggers.TensorBoardLogger(save_dir=log_path)
+    if args.logger.lower() == 'tensorboard':
+        logger = pl_loggers.TensorBoardLogger(save_dir=log_path)
+    elif args.logger.lower() == 'wandb':
+        project = os.getenv('PROJECT')
+        import wandb
+        wandb.login(key=os.getenv('WANDBKEY'))
+        logger = pl_loggers.WandbLogger(save_dir=log_path, project=project)
+        logger.watch(model, log='all')
 
     # train the model
     trainer = L.Trainer(
